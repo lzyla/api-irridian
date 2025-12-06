@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PV Estimate</title>
+  <style>
+    :root {
+      --bg: #0f1720;
+      --panel: #111c29;
+      --accent: #3fd0c9;
+      --accent-2: #f4b23c;
+      --text: #e9f1f7;
+      --muted: #9fb4c6;
+      --border: #1f2d3d;
+      --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      background: radial-gradient(120% 120% at 20% 20%, rgba(63, 208, 201, 0.08), transparent),
+        radial-gradient(120% 120% at 80% 0%, rgba(244, 178, 60, 0.08), transparent),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+    .shell {
+      width: min(1100px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    header {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    h1 {
+      margin: 0;
+      letter-spacing: -0.02em;
+      font-size: 26px;
+    }
+    .pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(63, 208, 201, 0.14);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+      border: 1px solid rgba(63, 208, 201, 0.3);
+    }
+    form {
+      display: grid;
+      gap: 14px;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0c141d;
+      color: var(--text);
+    }
+    input:focus, select:focus {
+      outline: 2px solid rgba(63, 208, 201, 0.5);
+      border-color: rgba(63, 208, 201, 0.7);
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    button {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none;
+      color: #0f1720;
+      font-weight: 700;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(63, 208, 201, 0.25);
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .note { color: var(--muted); font-size: 13px; }
+    .panel {
+      background: #0c141d;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      min-height: 160px;
+    }
+    .panel h2 { margin-top: 0; margin-bottom: 12px; font-size: 18px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 12px; }
+    .stat {
+      padding: 12px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+    }
+    .stat .label { color: var(--muted); font-size: 13px; }
+    .stat .value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+    pre {
+      background: #0a1017;
+      border-radius: 10px;
+      padding: 12px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      color: #d2e2ff;
+    }
+    .error { color: #ffb4b4; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <h1>PV Estimate</h1>
+      <div class="pill">PVGIS-backed · test UI</div>
+    </header>
+    <form id="pv-form">
+      <label> Szerokość geogr. (lat)
+        <input name="latitude" type="number" step="0.0001" value="50.25" required />
+      </label>
+      <label> Długość geogr. (lon)
+        <input name="longitude" type="number" step="0.0001" value="22.10" required />
+      </label>
+      <label> Kąt nachylenia [deg]
+        <input name="tilt_deg" type="number" step="1" value="35" min="0" max="90" required />
+      </label>
+      <label> Azymut
+        <select name="azimuth_deg">
+          <option value="0">Południe (0)</option>
+          <option value="-45">Południowy-wschód (-45)</option>
+          <option value="45">Południowy-zachód (45)</option>
+          <option value="-90">Wschód (-90)</option>
+          <option value="90">Zachód (90)</option>
+          <option value="180">Północ (180)</option>
+        </select>
+      </label>
+      <label> Moc instalacji [kWp]
+        <input name="system_size_kwp" type="number" step="0.1" value="6" min="0.1" required />
+      </label>
+      <label> Straty systemowe [%]
+        <input name="system_losses_percent" type="number" step="0.1" value="14" min="0" max="100" required />
+      </label>
+      <label> Cena energii [PLN/kWh]
+        <input name="energy_price_pln_per_kwh" type="number" step="0.01" value="0.85" min="0" required />
+      </label>
+      <label> Cena sprzedaży [PLN/kWh]
+        <input name="export_price_pln_per_kwh" type="number" step="0.01" value="0.45" min="0" required />
+      </label>
+      <label> Udział zużycia własnego [%]
+        <input name="self_consumption_ratio" type="number" step="0.01" value="0.7" min="0" max="1" required />
+      </label>
+      <label> Waluta
+        <input name="currency" type="text" value="PLN" required />
+      </label>
+      <div class="actions">
+        <button type="submit">Oblicz</button>
+        <span class="note">Wysyła POST /api/pv-estimate</span>
+      </div>
+    </form>
+    <div class="panel">
+      <h2>Wyniki</h2>
+      <div id="summary" class="stat-grid" aria-live="polite"></div>
+      <div id="error" class="error"></div>
+    </div>
+    <div class="panel">
+      <h2>Surowy JSON</h2>
+      <pre id="raw">Złóż zapytanie, aby zobaczyć odpowiedź...</pre>
+    </div>
+  </div>
+  <script>
+    const form = document.getElementById("pv-form");
+    const summaryEl = document.getElementById("summary");
+    const rawEl = document.getElementById("raw");
+    const errorEl = document.getElementById("error");
+
+    const formatNumber = (n) => Number(n).toLocaleString("pl-PL", { maximumFractionDigits: 1 });
+    const formatMoney = (n, currency) => `${formatNumber(n)} ${currency}`;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorEl.textContent = "";
+      summaryEl.innerHTML = "";
+      rawEl.textContent = "Ładowanie...";
+
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+      const numericKeys = [
+        "latitude",
+        "longitude",
+        "tilt_deg",
+        "azimuth_deg",
+        "system_size_kwp",
+        "system_losses_percent",
+        "energy_price_pln_per_kwh",
+        "export_price_pln_per_kwh",
+        "self_consumption_ratio",
+      ];
+      numericKeys.forEach((k) => { payload[k] = Number(payload[k]); });
+
+      try {
+        const res = await fetch("/api/pv-estimate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        rawEl.textContent = JSON.stringify(data, null, 2);
+        if (!res.ok) {
+          errorEl.textContent = data?.error || "Błąd";
+          return;
+        }
+        const { pv_output, economics } = data;
+        const currency = economics?.currency || payload.currency;
+        summaryEl.innerHTML = `
+          <div class="stat"><div class="label">Roczna energia</div><div class="value">${formatNumber(pv_output.annual_energy_kwh)} kWh</div></div>
+          <div class="stat"><div class="label">Zużycie własne</div><div class="value">${formatNumber(economics.self_consumption_kwh)} kWh</div></div>
+          <div class="stat"><div class="label">Oddane do sieci</div><div class="value">${formatNumber(economics.export_kwh)} kWh</div></div>
+          <div class="stat"><div class="label">Korzyść roczna</div><div class="value">${formatMoney(economics.total_value_pln, currency)}</div></div>
+        `;
+      } catch (err) {
+        errorEl.textContent = "Nie udało się połączyć z API";
+        rawEl.textContent = String(err);
+      }
+    });
+  </script>
+</body>
+</html>
