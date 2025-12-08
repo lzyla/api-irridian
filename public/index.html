@@ -6,28 +6,28 @@
   <title>PV Estimate</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #050b12;
-      --panel: #0f1c2a;
-      --panel-2: #0b1621;
-      --accent: #63f6c6;
-      --accent-2: #56c3ff;
-      --text: #f2f6ff;
-      --muted: #8fa6bb;
-      --border: #1b3042;
-      --shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+      --bg: #f2f7f3;
+      --panel: #ffffff;
+      --panel-2: #f8fbf8;
+      --accent: #2e7d32;
+      --accent-2: #4caf50;
+      --text: #0f2315;
+      --muted: #5f6b6c;
+      --border: #d9e5dc;
+      --shadow: 0 10px 32px rgba(26, 63, 36, 0.1);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Space Grotesk", "Trebuchet MS", "Segoe UI", sans-serif;
+      font-family: "DM Sans", "Trebuchet MS", "Segoe UI", sans-serif;
       line-height: 1.5;
       background:
-        radial-gradient(100% 80% at 15% 20%, rgba(99, 246, 198, 0.12), transparent),
-        radial-gradient(80% 80% at 85% 10%, rgba(86, 195, 255, 0.1), transparent),
-        linear-gradient(140deg, #081423, #0a1620 45%, #050b12);
+        radial-gradient(120% 100% at 15% 10%, rgba(76, 175, 80, 0.08), transparent),
+        radial-gradient(120% 120% at 90% 10%, rgba(46, 125, 50, 0.06), transparent),
+        var(--bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -37,12 +37,11 @@
     }
     .shell {
       width: min(1100px, 100%);
-      background: linear-gradient(150deg, rgba(20, 38, 54, 0.92), rgba(9, 20, 30, 0.92));
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: var(--panel);
+      border: 1px solid var(--border);
       border-radius: 18px;
       padding: 28px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 24px;
@@ -63,11 +62,11 @@
     .pill {
       padding: 6px 12px;
       border-radius: 999px;
-      background: rgba(86, 195, 255, 0.08);
+      background: rgba(76, 175, 80, 0.1);
       color: var(--accent);
       font-weight: 600;
       font-size: 13px;
-      border: 1px solid rgba(99, 246, 198, 0.3);
+      border: 1px solid rgba(76, 175, 80, 0.25);
     }
     form {
       display: grid;
@@ -87,13 +86,13 @@
       border: 1px solid var(--border);
       background: var(--panel-2);
       color: var(--text);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
     }
     input:focus, select:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(99, 246, 198, 0.22);
-      background: #0f1f2c;
+      box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.18);
+      background: #eef6ef;
     }
     .actions {
       display: flex;
@@ -102,47 +101,47 @@
       flex-wrap: wrap;
     }
     button {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background: var(--accent);
       border: none;
-      color: #041019;
+      color: #ffffff;
       font-weight: 700;
       padding: 12px 16px;
       border-radius: 12px;
       cursor: pointer;
       letter-spacing: 0.01em;
-      box-shadow: 0 14px 30px rgba(86, 195, 255, 0.26), 0 4px 18px rgba(0, 0, 0, 0.35);
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      box-shadow: 0 6px 20px rgba(46, 125, 50, 0.2);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
     }
-    button:hover { transform: translateY(-1px); box-shadow: 0 18px 36px rgba(86, 195, 255, 0.32), 0 6px 20px rgba(0, 0, 0, 0.4); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(46, 125, 50, 0.25); background: var(--accent-2); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
     .note { color: var(--muted); font-size: 13px; }
     .panel {
-      background: linear-gradient(160deg, rgba(17, 35, 51, 0.95), rgba(10, 23, 34, 0.95));
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: var(--panel);
+      border: 1px solid var(--border);
       border-radius: 14px;
       padding: 18px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
       min-height: 160px;
     }
     .panel h2 { margin-top: 0; margin-bottom: 12px; font-size: 18px; }
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 12px; }
     .stat {
       padding: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
       border-radius: 10px;
-      background: rgba(255,255,255,0.02);
+      background: #f7fbf8;
     }
     .stat .label { color: var(--muted); font-size: 13px; }
     .stat .value { font-size: 20px; font-weight: 700; margin-top: 4px; }
     pre {
-      background: #0c1c28;
+      background: #f7fbf8;
       border-radius: 10px;
       padding: 12px;
       overflow: auto;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      color: #d7e5ff;
+      border: 1px solid var(--border);
+      color: #203026;
     }
-    .error { color: #ff8f8f; font-weight: 600; }
+    .error { color: #c62828; font-weight: 600; }
   </style>
 </head>
 <body>
